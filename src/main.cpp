@@ -2,6 +2,7 @@
 #include <map>
 #include <FlyWin32.h>
 #include "Character.h"
+#include "CharacterManageSystem.h"
 #include "Camera.h"
 
 VIEWPORTid viewportID;	//major viewe port
@@ -12,8 +13,10 @@ ACTIONid idleID, runID, curPoseID;
 
 ROOMid terrainRoomID = FAILED_ID;
 TEXTid textID = FAILED_ID;
-Character actor;
+Character actor, ememy;
 Camera camera;
+
+CharacterManageSystem chrMgtSystem;
 
 
 BOOL4 DIR_KEYDOWN[4] = {FALSE, FALSE, FALSE, FALSE};
@@ -53,7 +56,7 @@ void FyMain(int argc, char **argv)
 	std::cout<<"Start Game";
 	std::cout.flush();
 	//create a new window
-	FyStartFlyWin32("HomeWork 2 - with Fly2", 0, 0, 1024, 768, FALSE);
+	FyStartFlyWin32("HomeWork 3 - with Fly2", 0, 0, 1024, 768, FALSE);
 	
 	//set up path
 	FySetShaderPath("Data\\NTU5\\Shaders");
@@ -89,18 +92,22 @@ void FyMain(int argc, char **argv)
 	FySetModelPath("Data\\NTU5\\Characters");
 	FySetTexturePath("Data\\NTU5\\Characters");
 	FySetCharacterPath("Data\\NTU5\\Characters");
-   actorID = scene.LoadCharacter("Lyubu2");
 
    // put the character on terrain
    float pos[3], fDir[3], uDir[3];
-	pos[0] = 3000, pos[1] = -3208; pos[2] = 0;
+	pos[0] = 3569.0, pos[1] = -3108; pos[2] = 0;
 	fDir[0] = 1, fDir[1] = 0; fDir[2] = 0;
 	uDir[0] = 0, uDir[1] = 0, uDir[2] = 1;
 
 
 	//初始化人物 注意cameraID要重設
+	actor.setMeshFileName("Lyubu2");
+	actor.setCharacterName("Lyubu2");
 	actor.initialize(sceneID, NULL, terrainRoomID);
 	actorID = actor.getCharacterId();
+	ememy.setMeshFileName("Donzo2");
+	ememy.setCharacterName("Donzo2");
+	ememy.initialize(sceneID, NULL, terrainRoomID, fDir, uDir, pos);
 
 	//初始化攝影機
 	camera.initialize(sceneID, terrainID, &actor);
@@ -112,6 +119,9 @@ void FyMain(int argc, char **argv)
 
 	//放好相機
 	camera.resetCamera();
+
+	chrMgtSystem.addCharacter(actor, true);
+	chrMgtSystem.addCharacter(ememy, false);
 
 
    // setup a point light
@@ -155,7 +165,7 @@ void FyMain(int argc, char **argv)
  --------------------------------------------------------------*/
 void GameAI(int skip)
 {
-    actor.update(skip);  //人物狀態的更新
+	chrMgtSystem.update(skip); //人物狀態的更新
    //Camera狀態的更新
 	camera.GameAIupdate(skip);
 	//camera.resetCamera();
@@ -170,8 +180,6 @@ void RenderIt(int skip){
 	//render the whole scene
 	vp.ID(viewportID);
 	vp.Render3D(cameraID, TRUE, TRUE);
-
-
 
 
 	//show frame rate
