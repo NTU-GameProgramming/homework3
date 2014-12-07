@@ -11,7 +11,7 @@ class FightSystem {
 
 		void initialize(Character **character_list, int character_list_size);
 
-		void judgeAttack(Character *character);
+		void judgeAttack(Character *attacker);
 
 	private:
 
