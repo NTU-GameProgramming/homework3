@@ -3,19 +3,21 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Character.h"
+#include "CharacterManageSystem.h"
 
 class FightSystem {
 	public:
 		FightSystem(void);
 		~FightSystem(void);
 
-		void initialize(Character **character_list, int character_list_size);
+		void initialize(CharacterManageSystem *cms, std::map<CHARACTERid, Character*> *id2character);
 
-		void judgeAttack(Character *attacker);
+		void judgeAttack(CHARACTERid attackerid);
 
 	private:
-
-		Character **character_list;
-		int character_list_size;
+		CharacterManageSystem *cms;
+		std::map<CHARACTERid, Character*> *id2character;
+		float attack_radius;
+		float attack_angle_cos;
 };
 
