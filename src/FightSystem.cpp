@@ -1,4 +1,5 @@
 #include "FightSystem.h"
+#include "CharacterManageSystem.h"
 #include <math.h>
 FightSystem::FightSystem(void) {
 }

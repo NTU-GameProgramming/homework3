@@ -285,7 +285,7 @@ public:
 		m_chrBlood.setBlood(curBlood);
 	}
 
-	void modifyChrBlood(int bloodDiff){
+	int modifyChrBlood(int bloodDiff){
 		m_chrBlood.modifyBlood(bloodDiff);
 		if(m_chrBlood.getBlood() == 0){
 			m_curState = MotionState::DEAD;
@@ -294,14 +294,20 @@ public:
 //		if(blood <= 0){
 //			m_curState = MotionState::DEAD;
 //		}
-
+		return m_chrBlood.getBlood();
 	}
+	int readChrBlood()
+	{
+		return m_chrBlood.getBlood();
+	}
+	void notOnCameraFocus()
+	{m_isOnCameraFocus = false;}
 private:
 	float getNewRotateAngle();
 
 public:
 	int collision; //人物是否碰撞中
-
+	
 private:
 	//friend object id
 	SCENEid m_sceneId;

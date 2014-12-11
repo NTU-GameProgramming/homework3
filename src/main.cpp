@@ -13,7 +13,7 @@ ACTIONid idleID, runID, curPoseID;
 
 ROOMid terrainRoomID = FAILED_ID;
 TEXTid textID = FAILED_ID;
-Character actor, ememy;
+TEXTid textCharID = FAILED_ID;
 Camera camera;
 
 CharacterManageSystem chrMgtSystem;
@@ -48,7 +48,8 @@ void InitMove(int, int);
 void MoveCam(int, int);
 void InitZoom(int, int);
 void ZoomCam(int, int);
-
+void ChangeActor(BYTE code, BOOL4 value);
+void setCamera();
 
 void FyMain(int argc, char **argv)
 {
@@ -101,6 +102,7 @@ void FyMain(int argc, char **argv)
 
 
 	//初始化人物 注意cameraID要重設
+	Character actor, ememy;
 	actor.setMeshFileName("Lyubu2");
 	actor.setCharacterName("Lyubu2");
 	actor.initialize(sceneID, NULL, terrainRoomID);
@@ -109,21 +111,10 @@ void FyMain(int argc, char **argv)
 	ememy.setCharacterName("Donzo2");
 	ememy.initialize(sceneID, NULL, terrainRoomID, fDir, uDir, pos);
 
-	//初始化攝影機
-	camera.initialize(sceneID, terrainID, &actor);
-	cameraID = camera.getCameraId();
-	cameraBaseID = camera.getCameraBaseId();
-
-	//重設人物的cameraBaseID
-	actor.setBaseCameraId(cameraBaseID);
-
-	//放好相機
-	camera.resetCamera();
-
 	chrMgtSystem.addCharacter(actor, true);
 	chrMgtSystem.addCharacter(ememy, false);
 
-
+	setCamera();
    // setup a point light
    /*
    FnLight light;
@@ -135,6 +126,7 @@ void FyMain(int argc, char **argv)
    */
    //create a text object for display message on screen
    textID = FyCreateText("Trebuchet MS", 18, FALSE, FALSE);
+   textCharID = FyCreateText("Trebuchet MS", 40, TRUE, FALSE);
 
    // set Hotkeys
    /*
@@ -144,6 +136,7 @@ void FyMain(int argc, char **argv)
    FyDefineHotKey(FY_LEFT, Movement, FALSE);    // Left for turning left
    FyDefineHotKey(FY_DOWN, Movement, FALSE);    // Down for moving backward
 	*/
+   FyDefineHotKey(FY_TAB, ChangeActor, FALSE);
    //define some mouse function
    FyBindMouseFunction(LEFT_MOUSE, InitPivot, PivotCam, NULL, NULL);
    FyBindMouseFunction(MIDDLE_MOUSE, InitZoom, ZoomCam, NULL, NULL);
@@ -166,6 +159,7 @@ void FyMain(int argc, char **argv)
 void GameAI(int skip)
 {
 	chrMgtSystem.update(skip); //人物狀態的更新
+	actorID = chrMgtSystem.getActorID();
    //Camera狀態的更新
 	camera.GameAIupdate(skip);
 	//camera.resetCamera();
@@ -199,10 +193,12 @@ void RenderIt(int skip){
 		frame = 0;
 	}
 
-	FnText text;
+	FnText text,charactorInfo;
 	text.ID(textID);
+	charactorInfo.ID(textCharID);
 
 	text.Begin(viewportID);
+	charactorInfo.Begin(viewportID);
 	text.Write(string, 20, 20, 255, 0, 0);
 
 	//get camera's data
@@ -241,8 +237,12 @@ void RenderIt(int skip){
 	text.Write(posS, 20, 125, 255, 255, 0);
     text.Write(fDirS, 20, 140, 255, 255, 0);
     text.Write(uDirS, 20, 155, 255, 255, 0);
+
    text.End();
 
+   	sprintf_s(posS, "血量:%d", chrMgtSystem.getCharacterblood(actorID));
+	charactorInfo.Write(posS, 100, 700, 255, 255, 100);
+	charactorInfo.End();
    FySwapBuffers();
 }
 
@@ -360,4 +360,24 @@ void ZoomCam(int x, int y)
       oldXMM = x;
       oldYMM = y;
    }
+}
+
+void ChangeActor(BYTE code, BOOL4 value)
+{
+	if (value)
+	{
+		chrMgtSystem.changActorByTAB();
+		actorID = chrMgtSystem.getActorID();
+		setCamera();
+	}
+}
+
+void setCamera()
+{
+	//初始化攝影機
+	camera.initialize(sceneID, terrainID, chrMgtSystem.getCameraActor());
+	cameraID = camera.getCameraId();
+	cameraBaseID = camera.getCameraBaseId();
+	//放好相機
+	camera.resetCamera();
 }

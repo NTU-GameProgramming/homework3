@@ -22,8 +22,8 @@ void Camera::initialize(const SCENEid &scene_id, const ROOMid &terrian_id, Chara
 	camera.SetFarPlane(100000.0f);
 	camera.SetParent(camera_base_id);
 
-
-
+	this->character->setBaseCameraId(camera_base_id);
+		
 	cam_disp_polar[0] = 700.0f; cam_disp_polar[1] = 10.0f;
 	cam_disp_cart[0] = cam_disp_polar[0] * cos(cam_disp_polar[1] * M_PI / 180.0);
 	cam_disp_cart[1] = cam_disp_polar[0] * sin(cam_disp_polar[1] * M_PI / 180.0);

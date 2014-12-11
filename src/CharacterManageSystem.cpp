@@ -22,6 +22,7 @@ bool CharacterManageSystem::addCharacter(Character &character, bool isLocalPlaye
 	m_mapStrName2CharacterId.insert(std::pair<std::string, CHARACTERid>(character.getCharacterName(), characterId));
 	if(isLocalPlayer){	
 		m_localPlayerId = characterId;
+		m_FightSystem.initialize(this,&m_mapCharacterId2Character);
 	}
 	return false;
 }
@@ -53,7 +54,7 @@ void CharacterManageSystem::updateCharacterInputs(){
 	m_mapCharacterId2NewState[m_localPlayerId] = (MotionState)newState;
 
 	//update other charcter's input state
-	m_mapCharacterId2NewState[m_mapStrName2CharacterId["Donzo2"]] = MotionState::IDLE;
+	//m_mapCharacterId2NewState[m_mapStrName2CharacterId["Donzo2"]] = MotionState::IDLE;
 }
 
 void CharacterManageSystem::update(int skip){
@@ -74,8 +75,53 @@ void CharacterManageSystem::update(int skip){
 		for(;chrIter != m_mapCharacterId2NewState.end(); ++chrIter){
 			if(chrIter->second == MotionState::ATTACK){
 				//trigger fight system
-				
+				m_FightSystem.judgeAttack(chrIter->first);
 			}
 		}
 	}
+}
+
+int CharacterManageSystem::getCharacterblood(CHARACTERid characterId)
+{
+	return m_mapCharacterId2Character[characterId]->readChrBlood();
+}
+
+CHARACTERid CharacterManageSystem::getActorID()
+{
+	return m_localPlayerId;
+}
+
+Character* CharacterManageSystem::getCameraActor()
+{
+	return m_mapCharacterId2Character[m_localPlayerId];
+}
+
+void CharacterManageSystem::gotAttacked(CHARACTERid characterId,float damage)
+{
+	Character* character = m_mapCharacterId2Character[characterId];
+	int blood = character->modifyChrBlood(-1 * damage);
+	if (blood)
+	{
+		m_mapCharacterId2NewState[characterId] = COOL_DOWN;
+	}
+
+}
+
+void CharacterManageSystem::changActorByTAB()
+{
+	std::map<CHARACTERid, Character*>::iterator chrIter = m_mapCharacterId2Character.begin();
+		for(; chrIter != m_mapCharacterId2Character.end(); ++chrIter){
+			if (chrIter->first == m_localPlayerId && std::next(chrIter, 1) == m_mapCharacterId2Character.end())
+			{
+				chrIter->second->notOnCameraFocus();
+				m_localPlayerId =  m_mapCharacterId2Character.begin()->first;
+				return;
+			}
+			else if (chrIter->first == m_localPlayerId)
+			{
+				chrIter->second->notOnCameraFocus();
+				m_localPlayerId = std::next(chrIter,1)->first;
+				return;
+			}
+		}
 }

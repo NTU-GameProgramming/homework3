@@ -3,7 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "Character.h"
-#include "CharacterManageSystem.h"
+class CharacterManageSystem;
 
 class FightSystem {
 	public:
