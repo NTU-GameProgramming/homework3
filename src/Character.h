@@ -301,7 +301,10 @@ public:
 		return m_chrBlood.getBlood();
 	}
 	void notOnCameraFocus()
-	{m_isOnCameraFocus = false;}
+	{
+		m_isOnCameraFocus = false;
+	}
+
 private:
 	float getNewRotateAngle();
 

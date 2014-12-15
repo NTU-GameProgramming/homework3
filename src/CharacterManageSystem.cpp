@@ -79,6 +79,17 @@ void CharacterManageSystem::update(int skip){
 			}
 		}
 	}
+
+	//update date character's COOL_DOWN
+	{
+		std::map<CHARACTERid, Character*>::iterator chrIter = m_mapCharacterId2Character.begin();
+		for(; chrIter != m_mapCharacterId2Character.end(); ++chrIter){
+			if ((chrIter->second)->getCurrentState() == MotionState(COOL_DOWN)) //state changes from character
+			{
+				m_mapCharacterId2NewState[(chrIter->first)] = MotionState(COOL_DOWN);
+			}
+		}
+	}
 }
 
 int CharacterManageSystem::getCharacterblood(CHARACTERid characterId)
@@ -102,7 +113,7 @@ void CharacterManageSystem::gotAttacked(CHARACTERid characterId,float damage)
 	int blood = character->modifyChrBlood(-1 * damage);
 	if (blood)
 	{
-		m_mapCharacterId2NewState[characterId] = COOL_DOWN;
+		m_mapCharacterId2NewState[characterId] = DAMAGED;
 	}
 
 }

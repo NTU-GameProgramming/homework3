@@ -240,7 +240,7 @@ void RenderIt(int skip){
 
    text.End();
 
-   	sprintf_s(posS, "¦å¶q:%d", chrMgtSystem.getCharacterblood(actorID));
+   	sprintf_s(posS, "HP:%d", chrMgtSystem.getCharacterblood(actorID));
 	charactorInfo.Write(posS, 100, 700, 255, 255, 100);
 	charactorInfo.End();
    FySwapBuffers();
